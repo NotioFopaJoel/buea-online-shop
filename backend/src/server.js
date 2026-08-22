@@ -26,13 +26,35 @@ const uploadRoutes = require('./routes/upload.routes');
 
 const app = express();
 
+// Render (and most PaaS hosts) place the app behind a reverse proxy that adds
+// an X-Forwarded-For header. Without telling Express to trust that first hop,
+// req.ip resolves to the proxy's internal address (seen as "::1" in logs)
+// instead of the real visitor IP, which breaks IP-based rate limiting and
+// makes express-rate-limit throw ERR_ERL_UNEXPECTED_X_FORWARDED_FOR.
+// "1" = trust exactly one hop in front of the app, which matches Render's setup.
+app.set('trust proxy', 1);
+
 // --- Security & core middleware ---
 // crossOriginResourcePolicy is relaxed to 'cross-origin' because the frontend
 // (a different origin in dev - :5173 vs :5000 - and potentially a different
 // domain in production) needs to load product images from /uploads via <img>.
 // Helmet's default 'same-origin' policy would otherwise silently block them.
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
-app.use(cors({ origin: env.CLIENT_URL, credentials: true }));
+
+// CLIENT_URL can be a single URL or a comma-separated list (e.g.
+// "http://localhost:5173,https://buea-online-shop.netlify.app"), so the same
+// backend accepts requests from local dev AND the deployed frontend without
+// having to keep swapping the env var back and forth between them.
+const allowedOrigins = env.CLIENT_URL.split(',').map((o) => o.trim()).filter(Boolean);
+app.use(cors({
+  origin(origin, callback) {
+    // Allow requests with no Origin header (server-to-server, curl, health checks)
+    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    console.warn(`[cors] Blocked request from unlisted origin: ${origin}`);
+    return callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+}));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(mongoSanitize());
