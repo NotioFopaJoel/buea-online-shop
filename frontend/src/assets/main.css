@@ -1,0 +1,86 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-primary: #F7F9FC;
+  --bg-secondary: #FFFFFF;
+  --bg-elevated: #FFFFFF;
+  --text-primary: #0A1230;
+  --text-secondary: #4B5875;
+  --border-color: #E4E9F2;
+  --card-background: #FFFFFF;
+  --accent-color: #1755F5;
+  --accent-cyan: #22D3EE;
+  --navy: #0A1230;
+}
+
+.dark {
+  --bg-primary: #050B1A;
+  --bg-secondary: #0A1230;
+  --bg-elevated: #101B44;
+  --text-primary: #F2F5FC;
+  --text-secondary: #A9B4CC;
+  --border-color: #1D2A4D;
+  --card-background: #101B44;
+  --accent-color: #4C86FF;
+  --accent-cyan: #67E8F9;
+  --navy: #050B1A;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+h1, h2, h3, h4, .font-display {
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--border-color);
+  border-radius: 8px;
+}
+
+.container-bos {
+  width: 100%;
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+@media (min-width: 768px) {
+  .container-bos {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+.card-surface {
+  background-color: var(--card-background);
+  border: 1px solid var(--border-color);
+}
+
+/* Line clamp utility for product names/descriptions */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

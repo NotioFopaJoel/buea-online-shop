@@ -1,0 +1,13 @@
+const jwt = require('jsonwebtoken');
+const env = require('../config/environment');
+
+/**
+ * Generates a signed JWT for a given user id and role.
+ */
+function generateToken(userId, role) {
+  return jwt.sign({ id: userId, role }, env.JWT_SECRET, {
+    expiresIn: env.JWT_EXPIRES_IN,
+  });
+}
+
+module.exports = generateToken;
