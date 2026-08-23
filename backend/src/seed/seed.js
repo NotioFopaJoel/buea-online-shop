@@ -26,7 +26,9 @@ const generateOrderNumber = require('../utils/generateOrderNumber');
 const placeholderImage = (seed) => `https://picsum.photos/seed/${seed}/600/600`;
 
 async function seed() {
-  await mongoose.connect(env.MONGO_URI);
+  // Same dbName override as database.js - guarantees the seed always
+  // populates "buea_online_shop" regardless of what's in MONGO_URI's path.
+  await mongoose.connect(env.MONGO_URI, { dbName: 'buea_online_shop' });
   console.log('[seed] Connected to MongoDB');
 
   console.log('[seed] Clearing existing data...');
