@@ -29,7 +29,7 @@ async function seed() {
   // Same dbName override as database.js - guarantees the seed always
   // populates "buea_online_shop" regardless of what's in MONGO_URI's path.
   await mongoose.connect(env.MONGO_URI, { dbName: 'buea_online_shop' });
-  console.log('[seed] Connected to MongoDB');
+  console.log(`[seed] Connected to MongoDB: ${mongoose.connection.host}/${mongoose.connection.name}`);
 
   console.log('[seed] Clearing existing data...');
   await Promise.all([
