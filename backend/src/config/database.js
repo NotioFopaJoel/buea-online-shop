@@ -8,7 +8,14 @@ const env = require('./environment');
 async function connectDatabase() {
   try {
     mongoose.set('strictQuery', true);
-    const conn = await mongoose.connect(env.MONGO_URI);
+    // Force the database name explicitly instead of relying on it being
+    // present in MONGO_URI. If the connection string's path is missing or
+    // wrong (e.g. "mongodb+srv://user:pass@cluster.mongodb.net/" with no
+    // "/buea_online_shop" segment), MongoDB silently falls back to a "test"
+    // database - which is exactly what happened here: the app was reading
+    // and writing an empty "test" DB instead of the seeded one. dbName here
+    // always wins over whatever (or nothing) is in the URI's path.
+    const conn = await mongoose.connect(env.MONGO_URI, { dbName: 'buea_online_shop' });
     console.log(`[database] MongoDB connected: ${conn.connection.host}/${conn.connection.name}`);
 
     mongoose.connection.on('error', (err) => {
