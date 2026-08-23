@@ -45,12 +45,29 @@ app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 // "http://localhost:5173,https://buea-online-shop.netlify.app"), so the same
 // backend accepts requests from local dev AND the deployed frontend without
 // having to keep swapping the env var back and forth between them.
-const allowedOrigins = env.CLIENT_URL.split(',').map((o) => o.trim()).filter(Boolean);
+// Trailing slashes are stripped automatically since a browser's Origin header
+// never includes one (a common source of "looks identical but doesn't match" bugs).
+const allowedOrigins = env.CLIENT_URL
+  .split(',')
+  .map((o) => o.trim().replace(/\/+$/, ''))
+  .filter(Boolean);
+
+// Logged on every boot so a mismatch is easy to spot in the Render/host logs:
+// compare this list against the exact "origin" shown in the browser's CORS error.
+console.log('[cors] Allowed origins:', allowedOrigins);
+
 app.use(cors({
   origin(origin, callback) {
     // Allow requests with no Origin header (server-to-server, curl, health checks)
-    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
-    console.warn(`[cors] Blocked request from unlisted origin: ${origin}`);
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    // Also trust any Vercel/Netlify subdomain automatically (preview deployments,
+    // renamed projects, etc.) so hosting-platform URL changes don't require
+    // touching the CLIENT_URL env var every time.
+    if (/^https:\/\/[a-z0-9-]+\.vercel\.app$/.test(origin) || /^https:\/\/[a-z0-9-]+\.netlify\.app$/.test(origin)) {
+      return callback(null, true);
+    }
+    console.warn(`[cors] Blocked request from unlisted origin: "${origin}"`);
     return callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
