@@ -37,6 +37,7 @@ const routes = [
       { path: 'users', name: 'AdminUsers', component: () => import('../admin/Users.vue') },
       { path: 'categories', name: 'AdminCategories', component: () => import('../admin/Categories.vue') },
       { path: 'promotions', name: 'AdminPromotions', component: () => import('../admin/Promotions.vue') },
+      { path: 'advertising', name: 'AdminAdvertising', component: () => import('../admin/Advertising.vue') },
       { path: 'settings', name: 'AdminSettings', component: () => import('../admin/Settings.vue') },
     ],
   },

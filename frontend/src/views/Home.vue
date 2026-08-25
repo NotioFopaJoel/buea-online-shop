@@ -2,6 +2,8 @@
   <div class="container-bos py-6">
     <HeroBanner />
 
+    <AdBanner />
+
     <!-- Shop by Category -->
     <section class="mb-8">
       <div class="flex items-center justify-between mb-4">
@@ -59,6 +61,19 @@
       </div>
       <ProductGrid :products="newArrivals" :loading="loadingNewArrivals" />
     </section>
+
+    <!-- Browse the entire catalog - a real "see everything" CTA, not filtered by any section -->
+    <section class="flex flex-col items-center text-center py-10 mb-4 rounded-card" style="background-color: var(--bg-secondary); border: 1px solid var(--border-color);">
+      <h2 class="font-display font-bold text-xl mb-2">{{ uiStore.t('home.browseAllTitle') }}</h2>
+      <p class="text-sm max-w-md mb-5" style="color: var(--text-secondary);">{{ uiStore.t('home.browseAllDesc') }}</p>
+      <router-link
+        :to="{ name: 'Shop' }"
+        class="inline-flex items-center gap-2 px-7 py-3 rounded-lg bg-navy-900 dark:bg-electric-500 text-white font-semibold text-sm hover:bg-navy-800 dark:hover:bg-electric-400 transition-colors"
+      >
+        {{ uiStore.t('home.viewAllProducts') }}
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+      </router-link>
+    </section>
   </div>
 </template>
 
@@ -70,6 +85,7 @@ import { useOrderStore } from '../stores/order';
 import productService from '../services/productService';
 
 import HeroBanner from '../components/home/HeroBanner.vue';
+import AdBanner from '../components/home/AdBanner.vue';
 import CategoryCard from '../components/home/CategoryCard.vue';
 import DealCard from '../components/home/DealCard.vue';
 import PromoBanner from '../components/home/PromoBanner.vue';

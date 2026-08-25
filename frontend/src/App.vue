@@ -7,7 +7,7 @@
       <router-view />
     </main>
 
-    <Footer class="hidden md:block" />
+    <Footer />
     <MobileNavbar class="md:hidden" />
     <ToastContainer />
     <OnboardingTour />

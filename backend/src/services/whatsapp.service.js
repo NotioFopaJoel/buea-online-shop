@@ -24,7 +24,11 @@ function buildOrderMessage(order, lang = 'en') {
     ? (lang === 'fr' ? 'GRATUITE' : 'FREE')
     : formatFCFA(order.deliveryFee);
 
-  const paymentLabel = order.paymentMethod === 'MTN_MOBILE_MONEY' ? 'MTN Mobile Money' : 'Orange Money';
+  const paymentLabel = order.paymentMethod === 'MTN_MOBILE_MONEY'
+    ? 'MTN Mobile Money'
+    : order.paymentMethod === 'ORANGE_MONEY'
+      ? 'Orange Money'
+      : (lang === 'fr' ? 'Espèces' : 'Cash');
 
   if (lang === 'fr') {
     return [

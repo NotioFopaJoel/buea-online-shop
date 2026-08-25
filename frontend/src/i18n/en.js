@@ -41,6 +41,9 @@ export default {
     specialOffer: 'Special Offer',
     specialOfferDesc: 'Up to 50% off on selected items',
     shopNow: 'Shop Now',
+    browseAllTitle: 'Looking for something else?',
+    browseAllDesc: 'Browse our entire catalog — every product, every category, all in one place.',
+    viewAllProducts: 'View All Products',
   },
   product: {
     addToCart: 'Add to Cart',
@@ -90,6 +93,7 @@ export default {
     payAfterDeliveryDesc: 'Payment is made after you receive your order.',
     mtn: 'MTN Mobile Money',
     orange: 'Orange Money',
+    cash: 'Cash on Delivery',
     payAfterDeliveryTag: 'Pay after delivery',
     reviewOrder: 'Review Order',
     placeOrder: 'Place Order',
@@ -163,6 +167,9 @@ export default {
     delete: 'Delete',
     seeMore: 'See more',
     fcfa: 'FCFA',
+    main: 'Main',
+    addPhoto: 'Add photo',
+    photoHelp: 'The first photo is the main image shown in the catalog.',
   },
   onboarding: {
     reopen: 'How this site works',

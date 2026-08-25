@@ -41,6 +41,9 @@ export default {
     specialOffer: 'Offre spéciale',
     specialOfferDesc: "Jusqu'à 50% de réduction sur une sélection d'articles",
     shopNow: 'Acheter maintenant',
+    browseAllTitle: "Vous cherchez autre chose ?",
+    browseAllDesc: 'Parcourez tout notre catalogue — tous les produits, toutes les catégories, au même endroit.',
+    viewAllProducts: 'Voir tous les articles',
   },
   product: {
     addToCart: 'Ajouter au panier',
@@ -90,6 +93,7 @@ export default {
     payAfterDeliveryDesc: 'Le paiement est effectué après réception de votre commande.',
     mtn: 'MTN Mobile Money',
     orange: 'Orange Money',
+    cash: 'Paiement en espèces',
     payAfterDeliveryTag: 'Paiement après livraison',
     reviewOrder: 'Vérifier la commande',
     placeOrder: 'Passer la commande',
@@ -163,6 +167,9 @@ export default {
     delete: 'Supprimer',
     seeMore: 'Voir plus',
     fcfa: 'FCFA',
+    main: 'Principale',
+    addPhoto: 'Ajouter',
+    photoHelp: 'La première photo est l\u2019image principale affichée dans le catalogue.',
   },
   onboarding: {
     reopen: 'Comment fonctionne le site',

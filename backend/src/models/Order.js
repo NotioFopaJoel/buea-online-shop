@@ -49,7 +49,7 @@ const orderSchema = new mongoose.Schema(
 
     paymentMethod: {
       type: String,
-      enum: ['MTN_MOBILE_MONEY', 'ORANGE_MONEY'],
+      enum: ['MTN_MOBILE_MONEY', 'ORANGE_MONEY', 'CASH'],
       required: true,
     },
     paymentStatus: {

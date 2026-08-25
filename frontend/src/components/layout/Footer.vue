@@ -1,16 +1,16 @@
 <template>
-  <footer style="background-color: var(--navy);" class="text-white/80 pt-12 pb-8">
+  <footer style="background-color: var(--navy);" class="text-white/80 pt-10 pb-24 md:pb-8">
     <div class="container-bos">
       <!-- Trust badges -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10 pb-10 border-b border-white/10">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8 sm:mb-10 pb-8 sm:pb-10 border-b border-white/10">
         <div v-for="badge in trustBadges" :key="badge" class="flex items-center gap-2 text-xs sm:text-sm">
           <svg class="w-4 h-4 text-cyan-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
           {{ badge }}
         </div>
       </div>
 
-      <div class="grid grid-cols-2 md:grid-cols-5 gap-8">
-        <div class="col-span-2">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8">
+        <div class="sm:col-span-2 md:col-span-2">
           <div class="flex items-center gap-2 mb-3">
             <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-electric-500 to-cyan-400 flex items-center justify-center">
               <span class="text-white font-display font-bold text-sm">B</span>

@@ -37,7 +37,7 @@
       <div class="rounded-card card-surface p-5 flex items-center justify-between">
         <div>
           <p class="text-sm font-semibold">{{ uiStore.t('checkout.paymentMethod') }}</p>
-          <p class="text-xs" style="color: var(--text-secondary);">{{ order.paymentMethod === 'MTN_MOBILE_MONEY' ? 'MTN Mobile Money' : 'Orange Money' }}</p>
+          <p class="text-xs" style="color: var(--text-secondary);">{{ paymentMethodLabel(order.paymentMethod, uiStore) }}</p>
         </div>
         <span class="text-xs font-semibold px-2.5 py-1 rounded-full" :class="order.paymentStatus === 'PAID' ? 'bg-green-500/10 text-green-600' : 'bg-amber-500/10 text-amber-600'">
           {{ uiStore.t(`paymentStatus.${order.paymentStatus}`) }}
@@ -53,6 +53,7 @@ import { useRoute } from 'vue-router';
 import { useUiStore } from '../stores/ui';
 import { useOrderStore } from '../stores/order';
 import { formatPrice } from '../utils/formatPrice';
+import { paymentMethodLabel } from '../utils/paymentMethod';
 import Loader from '../components/common/Loader.vue';
 
 const route = useRoute();

@@ -26,8 +26,8 @@ const createOrder = asyncHandler(async (req, res) => {
   if (!shippingAddress || !shippingAddress.neighborhood || !shippingAddress.address || !shippingAddress.phone || !shippingAddress.fullName) {
     return errorResponse(res, 400, 'Complete shipping information is required');
   }
-  if (!['MTN_MOBILE_MONEY', 'ORANGE_MONEY'].includes(paymentMethod)) {
-    return errorResponse(res, 400, 'A valid payment method (MTN Mobile Money or Orange Money) is required');
+  if (!['MTN_MOBILE_MONEY', 'ORANGE_MONEY', 'CASH'].includes(paymentMethod)) {
+    return errorResponse(res, 400, 'A valid payment method (MTN Mobile Money, Orange Money, or Cash) is required');
   }
 
   // 1. Verify Buea-only delivery zone

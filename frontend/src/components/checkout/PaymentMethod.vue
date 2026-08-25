@@ -33,5 +33,6 @@ const uiStore = useUiStore();
 const methods = [
   { value: 'MTN_MOBILE_MONEY', labelKey: 'checkout.mtn', short: 'MTN', color: '#FFCC00' },
   { value: 'ORANGE_MONEY', labelKey: 'checkout.orange', short: 'OM', color: '#FF6600' },
+  { value: 'CASH', labelKey: 'checkout.cash', short: '\u20A3', color: '#22C55E' },
 ];
 </script>

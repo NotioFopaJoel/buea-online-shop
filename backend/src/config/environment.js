@@ -28,6 +28,13 @@ module.exports = {
 
   WHATSAPP_BUSINESS_NUMBER: process.env.WHATSAPP_BUSINESS_NUMBER || '237670000000',
 
+  // Cloudinary - persistent storage for product photos & advertisement videos.
+  // Required in production (hosts like Render's free tier wipe local disk on
+  // every redeploy/restart, so files saved locally would disappear).
+  CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME || '',
+  CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY || '',
+  CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET || '',
+
   // Business rules - single source of truth, read by order.service.js
   DELIVERY_FREE_THRESHOLD: parseInt(process.env.DELIVERY_FREE_THRESHOLD, 10) || 10000,
   DELIVERY_FEE_STANDARD: parseInt(process.env.DELIVERY_FEE_STANDARD, 10) || 1000,

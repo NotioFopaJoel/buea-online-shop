@@ -14,6 +14,7 @@ export const ORDER_STATUSES = [
 export const PAYMENT_METHODS = [
   { value: 'MTN_MOBILE_MONEY', labelKey: 'checkout.mtn' },
   { value: 'ORANGE_MONEY', labelKey: 'checkout.orange' },
+  { value: 'CASH', labelKey: 'checkout.cash' },
 ];
 
 export const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];

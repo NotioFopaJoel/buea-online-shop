@@ -21,6 +21,7 @@ const items = [
   { to: '/admin/categories', label: 'Categories' },
   { to: '/admin/users', label: 'Users' },
   { to: '/admin/promotions', label: 'Promotions' },
+  { to: '/admin/advertising', label: 'Advertising' },
   { to: '/admin/settings', label: 'Settings' },
 ];
 </script>

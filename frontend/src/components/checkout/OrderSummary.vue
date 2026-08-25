@@ -16,7 +16,7 @@
 
     <div class="pt-3" style="border-top: 1px solid var(--border-color);">
       <h4 class="text-sm font-semibold mb-1">{{ uiStore.t('checkout.paymentMethod') }}</h4>
-      <p class="text-sm" style="color: var(--text-secondary);">{{ paymentMethod === 'MTN_MOBILE_MONEY' ? uiStore.t('checkout.mtn') : uiStore.t('checkout.orange') }} — {{ uiStore.t('checkout.payAfterDeliveryTag') }}</p>
+      <p class="text-sm" style="color: var(--text-secondary);">{{ paymentMethodLabel(paymentMethod, uiStore) }} — {{ uiStore.t('checkout.payAfterDeliveryTag') }}</p>
     </div>
 
     <CartSummary
@@ -31,6 +31,7 @@
 <script setup>
 import { useUiStore } from '../../stores/ui';
 import { formatPrice } from '../../utils/formatPrice';
+import { paymentMethodLabel } from '../../utils/paymentMethod';
 import CartSummary from '../cart/CartSummary.vue';
 
 defineProps({

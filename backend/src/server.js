@@ -23,6 +23,7 @@ const adminRoutes = require('./routes/admin.routes');
 const publicRoutes = require('./routes/public.routes');
 const sellerRoutes = require('./routes/seller.routes');
 const uploadRoutes = require('./routes/upload.routes');
+const advertisementRoutes = require('./routes/advertisement.routes');
 
 const app = express();
 
@@ -79,6 +80,9 @@ if (env.NODE_ENV !== 'test') {
   app.use(morgan(env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 }
 app.use('/api', apiLimiter);
+// Product/advertisement uploads now go straight to Cloudinary (see upload.middleware.js
+// and upload.controller.js) instead of local disk, so this route is kept only
+// as a harmless fallback for any legacy local file URLs from before that switch.
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 
 // --- Health check ---
@@ -100,6 +104,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/public', publicRoutes);
 app.use('/api/seller', sellerRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/advertisements', advertisementRoutes);
 
 // --- Error handling (must be last) ---
 app.use(notFound);

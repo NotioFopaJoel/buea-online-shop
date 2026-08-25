@@ -18,7 +18,7 @@
       <div class="flex items-center gap-1 ml-auto">
         <!-- Language switcher -->
         <button
-          class="hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold hover:bg-black/5 dark:hover:bg-white/10"
+          class="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold hover:bg-black/5 dark:hover:bg-white/10"
           style="color: var(--text-secondary);"
           @click="uiStore.toggleLanguage()"
         >
@@ -29,7 +29,7 @@
 
         <!-- Help / onboarding tour -->
         <button
-          class="hidden sm:flex w-9 h-9 items-center justify-center rounded-lg hover:bg-black/5 dark:hover:bg-white/10"
+          class="flex w-9 h-9 items-center justify-center rounded-lg hover:bg-black/5 dark:hover:bg-white/10"
           style="color: var(--text-secondary);"
           :title="uiStore.t('onboarding.reopen')"
           @click="uiStore.openOnboarding()"

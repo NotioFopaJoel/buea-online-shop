@@ -31,4 +31,13 @@ export default {
     formData.append('image', file);
     return uploadApi.post('/upload/image', formData);
   },
+
+  /**
+   * Uploads a single video file (used for homepage advertisement clips).
+   */
+  uploadVideo(file) {
+    const formData = new FormData();
+    formData.append('video', file);
+    return uploadApi.post('/upload/video', formData);
+  },
 };

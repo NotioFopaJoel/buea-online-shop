@@ -47,8 +47,25 @@
           </select>
         </div>
         <FormField v-model.number="form.price" label="Price (FCFA)" type="number" required />
+        <FormField v-model="form.brand" label="Brand" placeholder="e.g. BUEA ONLINE SHOP" />
         <FormField v-model.number="form.stock" label="Stock" type="number" required />
-        <ImageUploadField v-model="form.images[0]" label="Product Photo" required />
+        <MultiImageUploadField v-model="form.images" label="Product Photos" required />
+
+        <TagInput
+          v-if="colorsRelevant"
+          v-model="form.colors"
+          label="Colors"
+          placeholder="Type a color and press Enter"
+          :quick-add="COLOR_PRESETS"
+        />
+        <TagInput
+          v-if="sizePresets.length"
+          v-model="form.sizes"
+          label="Sizes"
+          placeholder="Type a size and press Enter"
+          :quick-add="sizePresets"
+        />
+
         <div>
           <label class="text-sm font-medium block mb-1.5">Description</label>
           <textarea v-model="form.description" required rows="3" class="w-full px-3 py-2.5 rounded-lg text-sm resize-none" style="border: 1px solid var(--border-color); background-color: var(--bg-secondary); color: var(--text-primary);" />
@@ -60,14 +77,16 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, computed, onMounted } from 'vue';
 import api from '../services/api';
 import { useAuthStore } from '../stores/auth';
 import { formatPrice } from '../utils/formatPrice';
+import { getSizePresets, isColorRelevant, COLOR_PRESETS } from '../utils/categoryFieldPresets';
 import Loader from '../components/common/Loader.vue';
 import Modal from '../components/common/Modal.vue';
 import FormField from '../components/common/FormField.vue';
-import ImageUploadField from '../components/common/ImageUploadField.vue';
+import MultiImageUploadField from '../components/common/MultiImageUploadField.vue';
+import TagInput from '../components/common/TagInput.vue';
 import Button from '../components/common/Button.vue';
 import SellerNav from './components/SellerNav.vue';
 
@@ -79,8 +98,15 @@ const saving = ref(false);
 const showModal = ref(false);
 const editing = ref(null);
 
-const emptyForm = () => ({ name: '', category: '', price: 0, stock: 0, images: [''], description: '' });
+const emptyForm = () => ({ name: '', category: '', brand: '', price: 0, stock: 0, images: [], description: '', colors: [], sizes: [] });
 const form = reactive(emptyForm());
+
+const selectedCategoryLabel = computed(() => {
+  const match = categories.value.find((c) => c._id === form.category);
+  return match ? match.name : '';
+});
+const sizePresets = computed(() => getSizePresets(selectedCategoryLabel.value));
+const colorsRelevant = computed(() => isColorRelevant(selectedCategoryLabel.value));
 
 async function fetchAll() {
   loading.value = true;
@@ -105,8 +131,15 @@ function openCreate() {
 function openEdit(product) {
   editing.value = product;
   Object.assign(form, {
-    name: product.name, category: product.category?._id || '', price: product.price,
-    stock: product.stock, images: product.images.length ? [...product.images] : [''], description: product.description,
+    name: product.name,
+    category: product.category?._id || '',
+    brand: product.brand || '',
+    price: product.price,
+    stock: product.stock,
+    images: product.images.length ? [...product.images] : [],
+    description: product.description,
+    colors: product.colors ? [...product.colors] : [],
+    sizes: product.sizes ? [...product.sizes] : [],
   });
   showModal.value = true;
 }
