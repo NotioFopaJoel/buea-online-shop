@@ -50,6 +50,11 @@ const userSchema = new mongoose.Schema(
     preferredLanguage: { type: String, enum: ['en', 'fr'], default: 'en' },
     isActive: { type: Boolean, default: true },
 
+    // Referral / Shop Credit
+    referralCode: { type: String, unique: true, sparse: true, default: null },
+    referredBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+    creditBalance: { type: Number, default: 0, min: 0 },
+
     // Seller-specific fields (used only when role === 'seller')
     sellerProfile: {
       shopName: { type: String, default: '' },

@@ -6,8 +6,8 @@
     </p>
 
     <div class="grid sm:grid-cols-2 gap-4">
-      <FormField v-model="form.fullName" :label="uiStore.t('checkout.fullName')" required />
-      <FormField v-model="form.phone" :label="uiStore.t('checkout.phone')" type="tel" required placeholder="+237 6XX XXX XXX" />
+      <FormField v-model="form.fullName" :label="uiStore.t('checkout.fullName')" :error="errors?.fullName" required />
+      <FormField v-model="form.phone" :label="uiStore.t('checkout.phone')" type="tel" :error="errors?.phone" required placeholder="+237 6XX XXX XXX" />
       <FormField v-model="form.whatsappNumber" :label="uiStore.t('checkout.whatsapp')" type="tel" placeholder="+237 6XX XXX XXX" />
       <FormField v-model="form.email" :label="uiStore.t('checkout.email')" type="email" />
 
@@ -18,14 +18,15 @@
 
       <div>
         <label class="text-sm font-medium block mb-1.5">{{ uiStore.t('checkout.neighborhood') }} <span class="text-promo">*</span></label>
-        <select v-model="form.neighborhood" required class="w-full px-3 py-2.5 rounded-lg text-sm" style="border: 1px solid var(--border-color); background-color: var(--bg-secondary); color: var(--text-primary);">
+        <select v-model="form.neighborhood" required class="w-full px-3 py-2.5 rounded-lg text-sm" :style="{ border: errors?.neighborhood ? '1px solid #ef4444' : '1px solid var(--border-color)', backgroundColor: 'var(--bg-secondary)', color: 'var(--text-primary)' }">
           <option value="" disabled>{{ uiStore.t('checkout.neighborhood') }}</option>
           <option v-for="zone in orderStore.deliveryZones" :key="zone._id" :value="zone.neighborhood">{{ zone.neighborhood }}</option>
         </select>
+        <p v-if="errors?.neighborhood" class="text-xs text-promo mt-1">{{ errors.neighborhood }}</p>
       </div>
     </div>
 
-    <FormField v-model="form.address" :label="uiStore.t('checkout.address')" required />
+    <FormField v-model="form.address" :label="uiStore.t('checkout.address')" :error="errors?.address" required />
     <FormField v-model="form.landmark" :label="uiStore.t('checkout.landmark')" />
     <div>
       <label class="text-sm font-medium block mb-1.5">{{ uiStore.t('checkout.deliveryInstructions') }}</label>
@@ -41,6 +42,10 @@ import { useOrderStore } from '../../stores/order';
 import FormField from '../common/FormField.vue';
 
 const form = defineModel({ type: Object, required: true });
+
+defineProps({
+  errors: { type: Object, default: () => ({}) },
+});
 
 const uiStore = useUiStore();
 const orderStore = useOrderStore();

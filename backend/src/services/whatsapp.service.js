@@ -17,7 +17,16 @@ function formatFCFA(amount) {
  */
 function buildOrderMessage(order, lang = 'en') {
   const productLines = order.items
-    .map((item) => `- ${item.name} x${item.quantity}`)
+    .map((item) => {
+      let line = `- ${item.name} x${item.quantity}`;
+      if (item.color || item.size) {
+        const parts = [];
+        if (item.color) parts.push(lang === 'fr' ? `Couleur: ${item.color}` : `Color: ${item.color}`);
+        if (item.size) parts.push(lang === 'fr' ? `Taille: ${item.size}` : `Size: ${item.size}`);
+        line += ` (${parts.join(', ')})`;
+      }
+      return line;
+    })
     .join('\n');
 
   const deliveryLabel = order.deliveryFee === 0

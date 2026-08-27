@@ -34,6 +34,7 @@
     </div>
 
     <p v-if="error" class="text-xs text-promo mt-1.5">{{ error }}</p>
+    <p v-else-if="uploadError" class="text-xs text-promo mt-1.5">{{ uploadError }}</p>
     <p v-else class="text-xs mt-1.5" style="color: var(--text-secondary);">
       {{ uiStore.t('common.photoHelp') }} ({{ modelValue.length }}/{{ max }})
     </p>
@@ -50,30 +51,31 @@ const props = defineProps({
   required: { type: Boolean, default: false },
   modelValue: { type: Array, default: () => [] },
   max: { type: Number, default: 6 },
+  error: { type: String, default: '' },
 });
 const emit = defineEmits(['update:modelValue']);
 
 const uiStore = useUiStore();
 const uploading = ref(false);
-const error = ref('');
+const uploadError = ref('');
 
 async function handleFileChange(event) {
   const file = event.target.files[0];
   if (!file) return;
 
   if (file.size > 5 * 1024 * 1024) {
-    error.value = 'File is too large (max 5MB).';
+    uploadError.value = 'File is too large (max 5MB).';
     event.target.value = '';
     return;
   }
 
-  error.value = '';
+  uploadError.value = '';
   uploading.value = true;
   try {
     const res = await uploadService.uploadImage(file);
     emit('update:modelValue', [...props.modelValue, res.data.url]);
   } catch (err) {
-    error.value = err.message || 'Upload failed, please try again.';
+    uploadError.value = err.message || 'Upload failed, please try again.';
   } finally {
     uploading.value = false;
     event.target.value = '';

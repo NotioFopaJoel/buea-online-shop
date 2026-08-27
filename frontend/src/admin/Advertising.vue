@@ -48,7 +48,7 @@
 
     <Modal v-model="showModal" :title="editing?._id ? 'Edit Advertisement' : 'Add Advertisement'">
       <form class="space-y-3" @submit.prevent="handleSave">
-        <FormField v-model="form.title" label="Title (English)" required placeholder="e.g. Summer Fashion Sale" />
+        <FormField v-model="form.title" label="Title (English)" :error="errors.title" required placeholder="e.g. Summer Fashion Sale" />
         <FormField v-model="form.titleFr" label="Titre (Français)" placeholder="ex: Soldes d'été" />
         <div>
           <label class="text-sm font-medium block mb-1.5">Description (English)</label>
@@ -136,6 +136,7 @@ const emptyForm = () => ({
   isActive: true, startDate: '', endDate: '',
 });
 const form = reactive(emptyForm());
+const errors = reactive({ title: '' });
 
 function ctr(ad) {
   if (!ad.views) return '0.0';
@@ -183,6 +184,11 @@ function openEdit(ad) {
 }
 
 async function handleSave() {
+  errors.title = '';
+  if (!form.title.trim()) {
+    errors.title = 'Title is required';
+    return;
+  }
   saving.value = true;
   try {
     const payload = {

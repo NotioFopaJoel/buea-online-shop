@@ -2,6 +2,7 @@ const { asyncHandler, successResponse, errorResponse } = require('../utils/respo
 const Payment = require('../models/Payment');
 const Order = require('../models/Order');
 const paymentService = require('../services/payment.service');
+const referralService = require('../services/referral.service');
 
 /**
  * GET /api/payments/order/:orderId
@@ -22,6 +23,10 @@ const confirmPayment = asyncHandler(async (req, res) => {
   const payment = await paymentService.markPaymentPaid(req.params.id, req.user._id, notes);
 
   await Order.findByIdAndUpdate(payment.order, { paymentStatus: 'PAID', paidAt: new Date() });
+
+  // Validate a pending referral if this order is now both DELIVERED and PAID.
+  const order = await Order.findById(payment.order);
+  await referralService.maybeValidateReferral(order);
 
   return successResponse(res, 200, 'Payment confirmed as Paid', { payment });
 });

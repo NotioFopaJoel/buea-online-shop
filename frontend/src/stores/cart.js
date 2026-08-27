@@ -81,6 +81,32 @@ export const useCartStore = defineStore('cart', {
     },
 
     /**
+     * Replaces the local cart with the authenticated user's server-side cart.
+     * Called after login so each account keeps its own cart.
+     */
+    async loadFromServer() {
+      const authStore = useAuthStore();
+      if (!authStore.isAuthenticated) {
+        this.clearCart();
+        return;
+      }
+      try {
+        const res = await userService.getCart();
+        const serverItems = ((res.data.cart && res.data.cart.items) || []).map((ci) => ({
+          id: `${ci.product?._id || ci.product}-${ci.color || ''}-${ci.size || ''}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+          product: ci.product || { _id: ci.product, price: 0, name: 'Unknown', images: [] },
+          quantity: ci.quantity,
+          color: ci.color || '',
+          size: ci.size || '',
+        }));
+        this.items = serverItems;
+        this.persist();
+      } catch {
+        // Non-blocking - keep current local cart
+      }
+    },
+
+    /**
      * Best-effort sync to the authenticated user's server-side cart.
      * Failures are silent - the local cart (source of truth for checkout)
      * still works even if the backend sync fails.

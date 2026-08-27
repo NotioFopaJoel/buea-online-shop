@@ -4,7 +4,7 @@
     <p class="text-sm text-center mb-6" style="color: var(--text-secondary);">Enter your email and we'll send you a reset link.</p>
 
     <form v-if="!sent" class="space-y-4" @submit.prevent="handleSubmit">
-      <FormField v-model="email" label="Email" type="email" required />
+      <FormField v-model="email" label="Email" type="email" :error="error" required />
       <Button type="submit" variant="primary" size="lg" full :loading="loading">Send Reset Link</Button>
     </form>
     <p v-else class="text-sm text-center px-4 py-3 rounded-lg bg-electric-500/10 text-electric-600">
@@ -26,8 +26,14 @@ import Button from '../components/common/Button.vue';
 const email = ref('');
 const loading = ref(false);
 const sent = ref(false);
+const error = ref('');
 
 async function handleSubmit() {
+  error.value = '';
+  if (!email.value.trim()) {
+    error.value = 'Email is required';
+    return;
+  }
   loading.value = true;
   try {
     await authService.forgotPassword(email.value);

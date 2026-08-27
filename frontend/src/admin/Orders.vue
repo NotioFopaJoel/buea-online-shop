@@ -44,6 +44,27 @@
           {{ order.shippingAddress.neighborhood }}, {{ order.shippingAddress.city }} · {{ formatPrice(order.total) }} · {{ order.items.length }} item(s)
         </p>
 
+        <div class="mb-3 space-y-2">
+          <div
+            v-for="(item, idx) in order.items"
+            :key="idx"
+            class="flex items-center gap-3 rounded-lg p-2.5"
+            style="background-color: var(--bg-primary); border: 1px solid var(--border-color);"
+          >
+            <img v-if="item.image" :src="item.image" class="w-10 h-10 rounded object-cover shrink-0" alt="" />
+            <div v-else class="w-10 h-10 rounded shrink-0 flex items-center justify-center text-xs" style="background-color: var(--bg-secondary); color: var(--text-secondary);">No img</div>
+            <div class="flex-1 min-w-0 text-sm">
+              <div class="font-medium truncate">{{ item.name }}</div>
+              <div class="text-xs mt-0.5" style="color: var(--text-secondary);">
+                <span>Qty : {{ item.quantity }}</span>
+                <span v-if="item.color" class="ml-2">Couleur : {{ item.color }}</span>
+                <span v-if="item.size" class="ml-2">Taille : {{ item.size }}</span>
+                <span class="ml-2">Prix : {{ formatPrice(item.price) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="flex flex-wrap gap-2">
           <a
             :href="whatsappContactLink(order)"

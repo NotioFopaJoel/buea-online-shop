@@ -14,8 +14,14 @@
       <div class="rounded-card card-surface p-5 mb-4">
         <h3 class="text-sm font-semibold mb-3">Items</h3>
         <div v-for="item in order.items" :key="item.product" class="flex justify-between text-sm py-1.5">
-          <span style="color: var(--text-secondary);">{{ item.name }} x{{ item.quantity }}</span>
-          <span class="font-medium">{{ formatPrice(item.price * item.quantity) }}</span>
+          <div>
+            <span style="color: var(--text-secondary);">{{ item.name }} x{{ item.quantity }}</span>
+            <div v-if="item.color || item.size" class="text-xs mt-0.5" style="color: var(--text-secondary);">
+              <span v-if="item.color">{{ uiStore.t('products.color') }} : {{ item.color }}</span>
+              <span v-if="item.size" class="ml-2">{{ uiStore.t('products.size') }} : {{ item.size }}</span>
+            </div>
+          </div>
+          <span class="font-medium shrink-0">{{ formatPrice(item.price * item.quantity) }}</span>
         </div>
         <div class="flex justify-between text-sm pt-3 mt-3" style="border-top: 1px solid var(--border-color);">
           <span style="color: var(--text-secondary);">{{ uiStore.t('cart.subtotal') }}</span><span>{{ formatPrice(order.subtotal) }}</span>

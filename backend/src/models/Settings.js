@@ -17,7 +17,12 @@ const settingsSchema = new mongoose.Schema(
       facebook: { type: String, default: '' },
       instagram: { type: String, default: '' },
       tiktok: { type: String, default: '' },
+      whatsapp: { type: String, default: '' },
     },
+
+    // Referral program settings
+    referralEnabled: { type: Boolean, default: true },
+    referralRewardPercentage: { type: Number, default: 2, min: 0, max: 50 },
   },
   { timestamps: true }
 );

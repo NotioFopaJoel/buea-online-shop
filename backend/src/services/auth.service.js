@@ -1,13 +1,24 @@
 const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
+const generateReferralCode = require('../utils/generateReferralCode');
 
-async function registerUser({ name, email, phone, password, preferredLanguage }) {
+async function registerUser({ name, email, phone, password, preferredLanguage, referralCode }) {
   const existing = await User.findOne({ email: email.toLowerCase() });
   if (existing) {
     const err = new Error('An account with this email already exists');
     err.statusCode = 409;
     throw err;
   }
+
+  let referredBy = null;
+  if (referralCode) {
+    const referrer = await User.findOne({ referralCode: referralCode.toUpperCase() });
+    if (referrer) {
+      referredBy = referrer._id;
+    }
+  }
+
+  const newCode = await generateReferralCode(User, name);
 
   const user = await User.create({
     name,
@@ -16,6 +27,8 @@ async function registerUser({ name, email, phone, password, preferredLanguage })
     password,
     preferredLanguage: preferredLanguage || 'en',
     role: 'customer',
+    referralCode: newCode,
+    referredBy,
   });
 
   const token = generateToken(user._id, user.role);

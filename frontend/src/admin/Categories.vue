@@ -31,7 +31,7 @@
 
     <Modal v-model="showModal" :title="editing?._id ? 'Edit Category' : 'Add Category'">
       <form class="space-y-3" @submit.prevent="handleSave">
-        <FormField v-model="form.name" label="Name (English)" required />
+        <FormField v-model="form.name" label="Name (English)" :error="errors.name" required />
         <FormField v-model="form.nameFr" label="Nom (Français)" />
         <FormField v-model="form.image" label="Image URL" />
         <div>
@@ -63,6 +63,7 @@ const showModal = ref(false);
 const editing = ref(null);
 
 const form = reactive({ name: '', nameFr: '', image: '', parentCategory: '' });
+const errors = reactive({ name: '' });
 
 async function fetchCategories() {
   loading.value = true;
@@ -87,6 +88,11 @@ function openEdit(cat) {
 }
 
 async function handleSave() {
+  errors.name = '';
+  if (!form.name.trim()) {
+    errors.name = 'Name is required';
+    return;
+  }
   saving.value = true;
   try {
     const payload = { ...form, parentCategory: form.parentCategory || null };

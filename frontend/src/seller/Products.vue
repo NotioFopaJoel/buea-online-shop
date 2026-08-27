@@ -38,18 +38,19 @@
 
     <Modal v-model="showModal" :title="editing?._id ? 'Edit Product' : 'Add Product'">
       <form class="space-y-3" @submit.prevent="handleSave">
-        <FormField v-model="form.name" label="Name" required />
+        <FormField v-model="form.name" label="Name" :error="errors.name" required />
         <div>
           <label class="text-sm font-medium block mb-1.5">Category</label>
-          <select v-model="form.category" required class="w-full px-3 py-2.5 rounded-lg text-sm" style="border: 1px solid var(--border-color); background-color: var(--bg-secondary); color: var(--text-primary);">
+          <select v-model="form.category" required class="w-full px-3 py-2.5 rounded-lg text-sm" :style="{ border: errors.category ? '1px solid #ef4444' : '1px solid var(--border-color)', backgroundColor: 'var(--bg-secondary)', color: 'var(--text-primary)' }">
             <option value="" disabled>Select category</option>
             <option v-for="c in categories" :key="c._id" :value="c._id">{{ c.name }}</option>
           </select>
+          <p v-if="errors.category" class="text-xs text-promo mt-1">{{ errors.category }}</p>
         </div>
-        <FormField v-model.number="form.price" label="Price (FCFA)" type="number" required />
+        <FormField v-model.number="form.price" label="Price (FCFA)" type="number" :error="errors.price" required />
         <FormField v-model="form.brand" label="Brand" placeholder="e.g. BUEA ONLINE SHOP" />
-        <FormField v-model.number="form.stock" label="Stock" type="number" required />
-        <MultiImageUploadField v-model="form.images" label="Product Photos" required />
+        <FormField v-model.number="form.stock" label="Stock" type="number" :error="errors.stock" required />
+        <MultiImageUploadField v-model="form.images" label="Product Photos" :error="errors.images" required />
 
         <TagInput
           v-if="colorsRelevant"
@@ -68,7 +69,8 @@
 
         <div>
           <label class="text-sm font-medium block mb-1.5">Description</label>
-          <textarea v-model="form.description" required rows="3" class="w-full px-3 py-2.5 rounded-lg text-sm resize-none" style="border: 1px solid var(--border-color); background-color: var(--bg-secondary); color: var(--text-primary);" />
+          <textarea v-model="form.description" rows="3" class="w-full px-3 py-2.5 rounded-lg text-sm resize-none" :style="{ border: errors.description ? '1px solid #ef4444' : '1px solid var(--border-color)', backgroundColor: 'var(--bg-secondary)', color: 'var(--text-primary)' }" />
+          <p v-if="errors.description" class="text-xs text-promo mt-1">{{ errors.description }}</p>
         </div>
         <Button type="submit" variant="primary" full :loading="saving">Save Product</Button>
       </form>
@@ -100,6 +102,7 @@ const editing = ref(null);
 
 const emptyForm = () => ({ name: '', category: '', brand: '', price: 0, stock: 0, images: [], description: '', colors: [], sizes: [] });
 const form = reactive(emptyForm());
+const errors = reactive({ name: '', category: '', price: '', stock: '', images: '', description: '' });
 
 const selectedCategoryLabel = computed(() => {
   const match = categories.value.find((c) => c._id === form.category);
@@ -145,6 +148,16 @@ function openEdit(product) {
 }
 
 async function handleSave() {
+  Object.assign(errors, { name: '', category: '', price: '', stock: '', images: '', description: '' });
+  let valid = true;
+  if (!form.name.trim()) { errors.name = 'Name is required'; valid = false; }
+  if (!form.category) { errors.category = 'Category is required'; valid = false; }
+  if (!form.price || form.price <= 0) { errors.price = 'A valid price is required'; valid = false; }
+  if (!form.stock && form.stock !== 0) { errors.stock = 'Stock is required'; valid = false; }
+  if (!form.images.length) { errors.images = 'At least one photo is required'; valid = false; }
+  if (!form.description.trim()) { errors.description = 'Description is required'; valid = false; }
+  if (!valid) return;
+
   saving.value = true;
   try {
     if (editing.value) {

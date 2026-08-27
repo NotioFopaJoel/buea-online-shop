@@ -4,7 +4,7 @@ const emailService = require('../services/email.service');
 const User = require('../models/User');
 
 const register = asyncHandler(async (req, res) => {
-  const { name, email, phone, password, preferredLanguage } = req.body;
+  const { name, email, phone, password, preferredLanguage, referralCode } = req.body;
 
   if (!name || !email || !phone || !password) {
     return errorResponse(res, 400, 'Name, email, phone and password are required');
@@ -13,7 +13,7 @@ const register = asyncHandler(async (req, res) => {
     return errorResponse(res, 400, 'Password must be at least 6 characters');
   }
 
-  const { user, token } = await authService.registerUser({ name, email, phone, password, preferredLanguage });
+  const { user, token } = await authService.registerUser({ name, email, phone, password, preferredLanguage, referralCode });
   emailService.sendWelcomeEmail(user, preferredLanguage).catch(() => {});
 
   return successResponse(res, 201, 'Account created successfully', { user, token });

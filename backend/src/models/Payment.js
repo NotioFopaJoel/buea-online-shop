@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const paymentSchema = new mongoose.Schema(
   {
     order: { type: mongoose.Schema.Types.ObjectId, ref: 'Order', required: true },
-    method: { type: String, enum: ['MTN_MOBILE_MONEY', 'ORANGE_MONEY'], required: true },
+    method: { type: String, enum: ['MTN_MOBILE_MONEY', 'ORANGE_MONEY', 'CASH'], required: true },
     amount: { type: Number, required: true },
     status: { type: String, enum: ['PENDING', 'PAID', 'FAILED', 'CANCELLED'], default: 'PENDING' },
     // Populated once MTN/Orange APIs are integrated. Null for manual confirmation (v1).

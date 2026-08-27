@@ -58,7 +58,8 @@ export const useOrderStore = defineStore('order', {
       this.loading = true;
       this.error = null;
       try {
-        const res = await orderService.trackOrder(orderNumber);
+        const normalized = String(orderNumber || '').trim().replace(/^#/, '');
+        const res = await orderService.trackOrder(normalized);
         this.trackedOrder = res.data.order;
         return res.data.order;
       } catch (err) {

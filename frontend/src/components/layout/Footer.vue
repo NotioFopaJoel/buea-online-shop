@@ -47,10 +47,19 @@
         <div>
           <h4 class="text-white font-semibold text-sm mb-3">{{ uiStore.t('footer.followUs') }}</h4>
           <ul class="space-y-2 text-sm text-white/60">
-            <li><router-link to="#" class="hover:text-white">Facebook</router-link></li>
-            <li><router-link to="#" class="hover:text-white">Instagram</router-link></li>
-            <li><router-link to="#" class="hover:text-white">TikTok</router-link></li>
-            <li><router-link to="#" class="hover:text-white">WhatsApp</router-link></li>
+            <li v-if="socialLinks.facebook">
+              <a :href="socialLinks.facebook" target="_blank" rel="noopener" class="hover:text-white block">Facebook</a>
+            </li>
+            <li v-if="socialLinks.instagram">
+              <a :href="socialLinks.instagram" target="_blank" rel="noopener" class="hover:text-white block">Instagram</a>
+            </li>
+            <li v-if="socialLinks.tiktok">
+              <a :href="socialLinks.tiktok" target="_blank" rel="noopener" class="hover:text-white block">TikTok</a>
+            </li>
+            <li v-if="socialLinks.whatsapp">
+              <a :href="socialLinks.whatsapp" target="_blank" rel="noopener" class="hover:text-white block">WhatsApp</a>
+            </li>
+            <li v-if="!hasAnySocial" class="text-white/40">—</li>
           </ul>
         </div>
       </div>
@@ -68,12 +77,32 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useUiStore } from '../../stores/ui';
+import orderService from '../../services/orderService';
 
 const uiStore = useUiStore();
 const subscribed = ref(false);
 const year = computed(() => new Date().getFullYear());
+
+const socialLinks = ref({ facebook: '', instagram: '', tiktok: '', whatsapp: '' });
+const hasAnySocial = computed(() =>
+  Object.values(socialLinks.value).some((v) => v && v.trim().length > 0)
+);
+
+onMounted(async () => {
+  try {
+    const res = await orderService.getPublicSettings();
+    socialLinks.value = {
+      facebook: res.data.settings.socialLinks?.facebook || '',
+      instagram: res.data.settings.socialLinks?.instagram || '',
+      tiktok: res.data.settings.socialLinks?.tiktok || '',
+      whatsapp: res.data.settings.socialLinks?.whatsapp || '',
+    };
+  } catch {
+    // silently ignore - footer social links stay hidden
+  }
+});
 
 const trustBadges = computed(() => [
   uiStore.t('trust.payAfterDelivery'),

@@ -22,6 +22,7 @@ const routes = [
   { path: '/register', name: 'Register', component: () => import('../views/Register.vue') },
   { path: '/forgot-password', name: 'ForgotPassword', component: () => import('../views/ForgotPassword.vue') },
   { path: '/profile', name: 'Profile', component: () => import('../views/Profile.vue'), meta: { requiresAuth: true } },
+  { path: '/r/:code', name: 'ReferralRedirect', component: () => import('../views/ReferralRedirect.vue') },
 
   { path: '/contact', name: 'Contact', component: () => import('../views/Contact.vue') },
   { path: '/about', name: 'About', component: () => import('../views/About.vue') },
@@ -38,6 +39,8 @@ const routes = [
       { path: 'categories', name: 'AdminCategories', component: () => import('../admin/Categories.vue') },
       { path: 'promotions', name: 'AdminPromotions', component: () => import('../admin/Promotions.vue') },
       { path: 'advertising', name: 'AdminAdvertising', component: () => import('../admin/Advertising.vue') },
+      { path: 'referrals', name: 'AdminReferrals', component: () => import('../admin/Referrals.vue') },
+      { path: 'messages', name: 'AdminMessages', component: () => import('../admin/Messages.vue') },
       { path: 'settings', name: 'AdminSettings', component: () => import('../admin/Settings.vue') },
     ],
   },

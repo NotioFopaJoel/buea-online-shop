@@ -5,6 +5,7 @@ const orderService = require('../services/order.service');
 const paymentService = require('../services/payment.service');
 const whatsappService = require('../services/whatsapp.service');
 const notificationService = require('../services/notification.service');
+const referralService = require('../services/referral.service');
 const generateOrderNumber = require('../utils/generateOrderNumber');
 
 /**
@@ -20,6 +21,7 @@ const createOrder = asyncHandler(async (req, res) => {
     shippingAddress,
     paymentMethod,
     couponCode,
+    useCredit,
     lang = 'en',
   } = req.body;
 
@@ -49,9 +51,16 @@ const createOrder = asyncHandler(async (req, res) => {
   // 4. Calculate delivery fee: FREE at/above 10,000 FCFA, else 1,000 FCFA
   const deliveryFee = await orderService.calculateDeliveryFee(subtotal - discount);
 
-  const total = subtotal - discount + deliveryFee;
+  // 5. Apply shop credit (only against merchandise subtotal, not delivery)
+  let creditUsed = 0;
+  if (req.user && useCredit && req.user.creditBalance > 0) {
+    const merchandiseAfterDiscount = subtotal - discount;
+    creditUsed = Math.min(req.user.creditBalance, merchandiseAfterDiscount);
+  }
 
-  // 5. Create the order
+  const total = subtotal - discount - creditUsed + deliveryFee;
+
+  // 6. Create the order
   const orderNumber = await generateOrderNumber();
 
   const order = await Order.create({
@@ -63,6 +72,7 @@ const createOrder = asyncHandler(async (req, res) => {
     subtotal,
     deliveryFee,
     discount,
+    creditUsed,
     total,
     couponCode: couponCode || '',
     paymentMethod,
@@ -70,13 +80,24 @@ const createOrder = asyncHandler(async (req, res) => {
     orderStatus: 'PENDING_CONFIRMATION',
   });
 
-  // 6. Reserve/deduct stock
+  // 7. Deduct credit atomically
+  if (creditUsed > 0) {
+    await User.updateOne(
+      { _id: req.user._id, creditBalance: { $gte: creditUsed } },
+      { $inc: { creditBalance: -creditUsed } }
+    );
+  }
+
+  // 8. Create pending referral reward
+  await referralService.handleNewOrder(order);
+
+  // 9. Reserve/deduct stock
   await orderService.deductStock(items);
 
-  // 7. Initialize payment record (pending - no charge happens now, see payment.service.js)
+  // 10. Initialize payment record (pending - no charge happens now, see payment.service.js)
   await paymentService.initializePayment(order);
 
-  // 8. Generate the WhatsApp confirmation link from REAL order data
+  // 11. Generate the WhatsApp confirmation link from REAL order data
   const whatsappLink = await whatsappService.buildWhatsAppLink(order, lang);
 
   return successResponse(res, 201, 'Order placed successfully', {
@@ -113,7 +134,12 @@ const getOrderById = asyncHandler(async (req, res) => {
  * GET /api/orders/track/:orderNumber - public order tracking, no auth required
  */
 const trackOrder = asyncHandler(async (req, res) => {
-  const order = await Order.findOne({ orderNumber: req.params.orderNumber }).select(
+  // Allow users to paste the order number with a leading "#" (as shown in the UI)
+  // or extra whitespace, and match case-insensitively.
+  const raw = (req.params.orderNumber || '').trim().replace(/^#/, '').toUpperCase();
+  const order = await Order.findOne({
+    orderNumber: { $regex: new RegExp('^' + raw.replace(/[.*+?^\${}()|[\]\\]/g, '\\$&') + '$', 'i') },
+  }).select(
     'orderNumber orderStatus paymentStatus whatsappStatus createdAt deliveredAt items subtotal deliveryFee discount total shippingAddress.neighborhood shippingAddress.city'
   );
   if (!order) return errorResponse(res, 404, 'No order found with this order number');
@@ -165,6 +191,15 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
   }
 
   await order.save();
+
+  if (orderStatus === 'DELIVERED') {
+    await referralService.maybeValidateReferral(order);
+  }
+  if (orderStatus === 'CANCELLED') {
+    await referralService.cancelReferralOnOrderCancel(order);
+    await referralService.refundCreditOnCancel(order);
+  }
+
   return successResponse(res, 200, 'Order status updated', { order });
 });
 
@@ -183,6 +218,10 @@ const updatePaymentStatus = asyncHandler(async (req, res) => {
   order.paymentStatus = paymentStatus;
   if (paymentStatus === 'PAID') order.paidAt = new Date();
   await order.save();
+
+  if (paymentStatus === 'PAID') {
+    await referralService.maybeValidateReferral(order);
+  }
 
   return successResponse(res, 200, 'Payment status updated', { order });
 });

@@ -29,6 +29,8 @@ export const useAuthStore = defineStore('auth', {
       try {
         const res = await authService.register(payload);
         this.persist(res.data.user, res.data.token);
+        // New accounts start with an empty cart.
+        import('./cart').then(({ useCartStore }) => useCartStore().clearCart());
         return res;
       } catch (err) {
         this.error = err.message;
@@ -44,6 +46,9 @@ export const useAuthStore = defineStore('auth', {
       try {
         const res = await authService.login(payload);
         this.persist(res.data.user, res.data.token);
+        // Load this account's own cart so it never bleeds over from another user.
+        const { useCartStore } = await import('./cart');
+        await useCartStore().loadFromServer();
         return res;
       } catch (err) {
         this.error = err.message;
@@ -58,6 +63,8 @@ export const useAuthStore = defineStore('auth', {
       this.token = null;
       localStorage.removeItem('bos_user');
       localStorage.removeItem('bos_token');
+      // Clear the shared local cart so it doesn't carry to the next account.
+      import('./cart').then(({ useCartStore }) => useCartStore().clearCart());
     },
 
     async fetchProfile() {

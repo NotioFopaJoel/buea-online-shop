@@ -21,7 +21,9 @@ const Product = require('../models/Product');
 const DeliveryZone = require('../models/DeliveryZone');
 const Settings = require('../models/Settings');
 const Order = require('../models/Order');
+const Referral = require('../models/Referral');
 const generateOrderNumber = require('../utils/generateOrderNumber');
+const generateReferralCode = require('../utils/generateReferralCode');
 
 const placeholderImage = (seed) => `https://picsum.photos/seed/${seed}/600/600`;
 
@@ -39,6 +41,7 @@ async function seed() {
     DeliveryZone.deleteMany({}),
     Settings.deleteMany({}),
     Order.deleteMany({}),
+    Referral.deleteMany({}),
   ]);
 
   // ---------- Settings ----------
@@ -49,7 +52,9 @@ async function seed() {
     activeDeliveryCity: env.DEFAULT_DELIVERY_CITY,
     supportEmail: 'support@bueaonlineshop.com',
     supportPhone: `+${env.WHATSAPP_BUSINESS_NUMBER}`,
-    socialLinks: { facebook: '', instagram: '', tiktok: '' },
+    socialLinks: { facebook: '', instagram: '', tiktok: '', whatsapp: '' },
+    referralEnabled: true,
+    referralRewardPercentage: 2,
   });
   console.log('[seed] Settings created');
 
@@ -124,7 +129,7 @@ async function seed() {
   console.log(`[seed] ${categoryDefs.length} categories (+ subcategories) created`);
 
   // ---------- Users ----------
-  await User.create({
+  const adminUser = await User.create({
     name: 'BUEA ONLINE SHOP Admin',
     email: 'admin@bueaonlineshop.com',
     phone: '+237670000001',
@@ -132,12 +137,13 @@ async function seed() {
     password: 'Admin@12345',
     role: 'admin',
     preferredLanguage: 'en',
+    referralCode: 'ADM001',
   });
 
   const sellerDefs = [
-    { name: 'Ngwa Fashion Store', email: 'seller1@bueaonlineshop.com', shopName: 'Ngwa Fashion Store' },
-    { name: 'Molyko Electronics Hub', email: 'seller2@bueaonlineshop.com', shopName: 'Molyko Electronics Hub' },
-    { name: 'Buea Beauty Corner', email: 'seller3@bueaonlineshop.com', shopName: 'Buea Beauty Corner' },
+    { name: 'Ngwa Fashion Store', email: 'seller1@bueaonlineshop.com', shopName: 'Ngwa Fashion Store', code: 'NGW001' },
+    { name: 'Molyko Electronics Hub', email: 'seller2@bueaonlineshop.com', shopName: 'Molyko Electronics Hub', code: 'MOL001' },
+    { name: 'Buea Beauty Corner', email: 'seller3@bueaonlineshop.com', shopName: 'Buea Beauty Corner', code: 'BEA001' },
   ];
   const sellers = [];
   for (let i = 0; i < sellerDefs.length; i += 1) {
@@ -148,6 +154,7 @@ async function seed() {
       password: 'Seller@12345',
       role: 'seller',
       sellerProfile: { shopName: sellerDefs[i].shopName, isApproved: true, description: 'Trusted local seller.' },
+      referralCode: sellerDefs[i].code,
     });
     sellers.push(s);
   }
@@ -160,6 +167,7 @@ async function seed() {
       phone: `+23769000${String(i).padStart(4, '0')}`,
       password: 'Customer@123',
       role: 'customer',
+      referralCode: `CUS${String(i).padStart(3, '0')}`,
       addresses: [
         {
           label: 'Home',
@@ -173,6 +181,22 @@ async function seed() {
     });
     customers.push(c);
   }
+
+  // Make Customer 2 referred by Customer 1, Customer 3 referred by Customer 1
+  await User.updateOne(
+    { _id: customers[1]._id },
+    { $set: { referredBy: customers[0]._id } }
+  );
+  await User.updateOne(
+    { _id: customers[2]._id },
+    { $set: { referredBy: customers[0]._id } }
+  );
+
+  // Give Customer 2 some credit balance
+  await User.updateOne(
+    { _id: customers[0]._id },
+    { $set: { creditBalance: 7500 } }
+  );
   console.log(`[seed] 1 admin, ${sellers.length} sellers, ${customers.length} customers created`);
 
   // ---------- Products ----------
@@ -498,6 +522,40 @@ async function seed() {
     });
   }
   console.log('[seed] 6 demo orders created');
+
+  // ---------- Demo Referrals ----------
+  // Customer 2 was referred by Customer 1, and their first order is the one created above
+  const customer2Orders = await Order.find({ user: customers[1]._id });
+  if (customer2Orders.length > 0) {
+    await Referral.create({
+      referrer: customers[0]._id,
+      referee: customers[1]._id,
+      code: 'CUS001',
+      order: customer2Orders[0]._id,
+      merchandiseSubtotal: customer2Orders[0].subtotal,
+      rewardPercentage: 2,
+      rewardAmount: Math.round(customer2Orders[0].subtotal * 0.02),
+      status: 'VALIDATED',
+      validatedAt: new Date(),
+    });
+  }
+
+  // Customer 3 was also referred by Customer 1, with a PENDING reward
+  const customer3Orders = await Order.find({ user: customers[2]._id });
+  if (customer3Orders.length > 0) {
+    await Referral.create({
+      referrer: customers[0]._id,
+      referee: customers[2]._id,
+      code: 'CUS001',
+      order: customer3Orders[0]._id,
+      merchandiseSubtotal: customer3Orders[0].subtotal,
+      rewardPercentage: 2,
+      rewardAmount: Math.round(customer3Orders[0].subtotal * 0.02),
+      status: 'PENDING',
+    });
+  }
+
+  console.log('[seed] 2 demo referrals created');
 
   console.log('\n[seed] Done! Demo credentials:');
   console.log('  Admin:    admin@bueaonlineshop.com / Admin@12345');

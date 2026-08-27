@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/admin.controller');
+const contactController = require('../controllers/contact.controller');
 const { protect } = require('../middleware/auth.middleware');
 const { adminOnly } = require('../middleware/admin.middleware');
 
@@ -21,5 +22,10 @@ router.get('/coupons', adminController.getCoupons);
 router.post('/coupons', adminController.createCoupon);
 router.put('/coupons/:id', adminController.updateCoupon);
 router.delete('/coupons/:id', adminController.deleteCoupon);
+
+router.get('/contact-messages', contactController.getMessages);
+router.patch('/contact-messages/:id', contactController.updateMessage);
+router.post('/contact-messages/:id/reply', contactController.replyMessage);
+router.delete('/contact-messages/:id', contactController.deleteMessage);
 
 module.exports = router;

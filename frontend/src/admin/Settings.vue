@@ -19,6 +19,18 @@
         <Button variant="primary" class="mt-4" :loading="savingSettings" @click="handleSaveSettings">Save Settings</Button>
       </div>
 
+      <div class="rounded-card card-surface p-5 mb-6">
+        <h3 class="font-semibold mb-1">Social Media Links</h3>
+        <p class="text-xs mb-4" style="color: var(--text-secondary);">Used in the site footer under "Follow Us". Leave empty to hide a link.</p>
+        <div class="grid sm:grid-cols-2 gap-4">
+          <FormField v-model="settingsForm.socialLinks.facebook" label="Facebook URL" placeholder="https://facebook.com/yourpage" />
+          <FormField v-model="settingsForm.socialLinks.instagram" label="Instagram URL" placeholder="https://instagram.com/yourpage" />
+          <FormField v-model="settingsForm.socialLinks.tiktok" label="TikTok URL" placeholder="https://tiktok.com/@yourpage" />
+          <FormField v-model="settingsForm.socialLinks.whatsapp" label="WhatsApp Link" placeholder="https://wa.me/237670000000" />
+        </div>
+        <Button variant="primary" class="mt-4" :loading="savingSettings" @click="handleSaveSettings">Save Social Links</Button>
+      </div>
+
       <div class="rounded-card card-surface p-5">
         <div class="flex items-center justify-between mb-4">
           <h3 class="font-semibold">Buea Delivery Zones</h3>
@@ -39,7 +51,7 @@
 
     <Modal v-model="showZoneModal" title="Add Delivery Zone">
       <form class="space-y-3" @submit.prevent="handleAddZone">
-        <FormField v-model="newZone.neighborhood" label="Neighborhood" required placeholder="e.g. Bomaka" />
+        <FormField v-model="newZone.neighborhood" label="Neighborhood" :error="zoneError" required placeholder="e.g. Bomaka" />
         <Button type="submit" variant="primary" full>Add Zone</Button>
       </form>
     </Modal>
@@ -60,11 +72,28 @@ const savingSettings = ref(false);
 const showZoneModal = ref(false);
 const zones = ref([]);
 const newZone = reactive({ neighborhood: '' });
+const zoneError = ref('');
 
 const settingsForm = reactive({
   whatsappBusinessNumber: '', deliveryFreeThreshold: 10000, deliveryFeeStandard: 1000,
   activeDeliveryCity: 'Buea', supportEmail: '', supportPhone: '',
+  socialLinks: { facebook: '', instagram: '', tiktok: '', whatsapp: '' },
 });
+
+function assignSettings(data) {
+  settingsForm.whatsappBusinessNumber = data.whatsappBusinessNumber ?? '';
+  settingsForm.deliveryFreeThreshold = data.deliveryFreeThreshold ?? 10000;
+  settingsForm.deliveryFeeStandard = data.deliveryFeeStandard ?? 1000;
+  settingsForm.activeDeliveryCity = data.activeDeliveryCity ?? 'Buea';
+  settingsForm.supportEmail = data.supportEmail ?? '';
+  settingsForm.supportPhone = data.supportPhone ?? '';
+  settingsForm.socialLinks = {
+    facebook: data.socialLinks?.facebook ?? '',
+    instagram: data.socialLinks?.instagram ?? '',
+    tiktok: data.socialLinks?.tiktok ?? '',
+    whatsapp: data.socialLinks?.whatsapp ?? '',
+  };
+}
 
 async function fetchAll() {
   loading.value = true;
@@ -73,7 +102,7 @@ async function fetchAll() {
       api.get('/admin/settings'),
       api.get('/admin/delivery-zones'),
     ]);
-    Object.assign(settingsForm, settingsRes.data.settings);
+    assignSettings(settingsRes.data.settings);
     zones.value = zonesRes.data.zones;
   } finally {
     loading.value = false;
@@ -90,6 +119,11 @@ async function handleSaveSettings() {
 }
 
 async function handleAddZone() {
+  zoneError.value = '';
+  if (!newZone.neighborhood.trim()) {
+    zoneError.value = 'Neighborhood is required';
+    return;
+  }
   await api.post('/admin/delivery-zones', { city: settingsForm.activeDeliveryCity, neighborhood: newZone.neighborhood });
   newZone.neighborhood = '';
   showZoneModal.value = false;

@@ -39,7 +39,7 @@
 
     <Modal v-model="showModal" title="Add Coupon">
       <form class="space-y-3" @submit.prevent="handleSave">
-        <FormField v-model="form.code" label="Coupon Code" required placeholder="e.g. WELCOME10" />
+        <FormField v-model="form.code" label="Coupon Code" :error="errors.code" required placeholder="e.g. WELCOME10" />
         <div>
           <label class="text-sm font-medium block mb-1.5">Type</label>
           <select v-model="form.type" class="w-full px-3 py-2.5 rounded-lg text-sm" style="border: 1px solid var(--border-color); background-color: var(--bg-secondary); color: var(--text-primary);">
@@ -47,12 +47,12 @@
             <option value="FIXED">Fixed Amount (FCFA)</option>
           </select>
         </div>
-        <FormField v-model.number="form.value" label="Value" type="number" required />
+        <FormField v-model.number="form.value" label="Value" type="number" :error="errors.value" required />
         <FormField v-model.number="form.minimumOrder" label="Minimum Order (FCFA)" type="number" />
         <FormField v-model.number="form.maximumDiscount" label="Maximum Discount (FCFA, optional)" type="number" />
         <div class="grid grid-cols-2 gap-3">
-          <FormField v-model="form.startDate" label="Start Date" type="date" required />
-          <FormField v-model="form.endDate" label="End Date" type="date" required />
+          <FormField v-model="form.startDate" label="Start Date" type="date" :error="errors.startDate" required />
+          <FormField v-model="form.endDate" label="End Date" type="date" :error="errors.endDate" required />
         </div>
         <Button type="submit" variant="primary" full :loading="saving">Save Coupon</Button>
       </form>
@@ -76,6 +76,7 @@ const saving = ref(false);
 const showModal = ref(false);
 
 const form = reactive({ code: '', type: 'PERCENTAGE', value: 10, minimumOrder: 0, maximumDiscount: null, startDate: '', endDate: '' });
+const errors = reactive({ code: '', value: '', startDate: '', endDate: '' });
 
 async function fetchCoupons() {
   loading.value = true;
@@ -93,6 +94,15 @@ function openCreate() {
 }
 
 async function handleSave() {
+  Object.assign(errors, { code: '', value: '', startDate: '', endDate: '' });
+  let valid = true;
+  if (!form.code.trim()) { errors.code = 'Coupon code is required'; valid = false; }
+  if (!form.value || form.value <= 0) { errors.value = 'A valid value is required'; valid = false; }
+  if (!form.startDate) { errors.startDate = 'Start date is required'; valid = false; }
+  if (!form.endDate) { errors.endDate = 'End date is required'; valid = false; }
+  if (form.startDate && form.endDate && new Date(form.endDate) <= new Date(form.startDate)) { errors.endDate = 'End date must be after start date'; valid = false; }
+  if (!valid) return;
+
   saving.value = true;
   try {
     await api.post('/admin/coupons', form);

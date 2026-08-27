@@ -24,6 +24,8 @@ const publicRoutes = require('./routes/public.routes');
 const sellerRoutes = require('./routes/seller.routes');
 const uploadRoutes = require('./routes/upload.routes');
 const advertisementRoutes = require('./routes/advertisement.routes');
+const referralRoutes = require('./routes/referral.routes');
+const contactRoutes = require('./routes/contact.routes');
 
 const app = express();
 
@@ -105,6 +107,8 @@ app.use('/api/public', publicRoutes);
 app.use('/api/seller', sellerRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/advertisements', advertisementRoutes);
+app.use('/api/referrals', referralRoutes);
+app.use('/api/contact', contactRoutes);
 
 // --- Error handling (must be last) ---
 app.use(notFound);

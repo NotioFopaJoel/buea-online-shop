@@ -9,6 +9,7 @@
         <span class="font-medium">{{ deliveryFee === 0 ? uiStore.t('cart.free') : formatPrice(deliveryFee) }}</span>
       </div>
       <div v-if="discount > 0" class="flex justify-between"><span style="color: var(--text-secondary);">{{ uiStore.t('cart.discount') }}</span><span class="font-medium text-promo">-{{ formatPrice(discount) }}</span></div>
+      <div v-if="creditUsed > 0" class="flex justify-between"><span style="color: var(--text-secondary);">{{ uiStore.t('referral.creditBalance') }}</span><span class="font-medium text-green-600">-{{ formatPrice(creditUsed) }}</span></div>
     </div>
 
     <div class="flex justify-between items-baseline mt-4 pt-4" style="border-top: 1px solid var(--border-color);">
@@ -32,6 +33,7 @@ defineProps({
   subtotal: { type: Number, required: true },
   deliveryFee: { type: Number, required: true },
   discount: { type: Number, default: 0 },
+  creditUsed: { type: Number, default: 0 },
   total: { type: Number, required: true },
   amountUntilFree: { type: Number, default: 0 },
 });
