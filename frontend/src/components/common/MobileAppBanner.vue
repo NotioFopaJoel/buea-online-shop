@@ -10,7 +10,10 @@
           <p class="text-xs text-white/70">Faster, free &amp; works offline</p>
         </div>
       </div>
-      <InstallAppButton label="Install App" size="md" />
+      <div class="flex items-center gap-2">
+        <DownloadAndroidButton label="Android" />
+        <InstallAppButton label="Install" size="md" />
+      </div>
     </div>
   </div>
 </template>

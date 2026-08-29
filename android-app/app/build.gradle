@@ -1,0 +1,59 @@
+plugins {
+    id 'com.android.application'
+}
+
+// Load signing config from a local (git-ignored) properties file, or fall back
+// to environment variables. This keeps the keystore password out of version control.
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+android {
+    namespace 'com.buea.shop'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.buea.shop"
+        minSdk 23
+        targetSdk 34
+        versionCode 1
+        versionName "1.0.0"
+    }
+
+    signingConfigs {
+        release {
+            storeFile file(keystoreProperties['storeFile'] ?: "../buea-release.keystore")
+            storePassword keystoreProperties['storePassword'] ?: System.getenv('BUEA_STORE_PASSWORD')
+            keyAlias keystoreProperties['keyAlias'] ?: "buea"
+            keyPassword keystoreProperties['keyPassword'] ?: System.getenv('BUEA_KEY_PASSWORD')
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.core:core:1.12.0'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+
+    // Workaround for duplicate Kotlin stdlib (jdk8) classes introduced by
+    // different transitive versions. Since Kotlin 1.8 the -jdk8 artifact is
+    // merged into kotlin-stdlib, so the legacy jdk7/jdk8 variants can be dropped.
+    configurations.all {
+        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
+        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
+    }
+}

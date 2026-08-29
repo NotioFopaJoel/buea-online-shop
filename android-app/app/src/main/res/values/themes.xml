@@ -1,0 +1,7 @@
+<resources>
+    <style name="Theme.BueaShop" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">#071F55</item>
+        <item name="android:navigationBarColor">#071F55</item>
+        <item name="android:windowBackground">#071F55</item>
+    </style>
+</resources>

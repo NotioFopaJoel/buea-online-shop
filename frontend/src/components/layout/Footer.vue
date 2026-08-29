@@ -16,6 +16,7 @@
             <span class="font-display font-bold text-white">BUEA ONLINE SHOP</span>
           </div>
           <p class="text-sm text-white/60 mb-4">Shop Everything. Delivered in Buea.</p>
+          <DownloadAndroidButton class="mb-4" />
           <p class="text-xs text-white/50 mb-4">{{ uiStore.t('footer.newsletter') }}</p>
           <form class="flex gap-2" @submit.prevent="subscribed = true">
             <input type="email" required placeholder="you@email.com" class="flex-1 min-w-0 px-3 py-2 rounded-lg text-sm bg-white/10 border border-white/10 text-white placeholder-white/40 focus:outline-none" />
@@ -79,6 +80,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useUiStore } from '../../stores/ui';
 import orderService from '../../services/orderService';
 import BrandLogo from '../common/BrandLogo.vue';
+import DownloadAndroidButton from '../common/DownloadAndroidButton.vue';
 
 const uiStore = useUiStore();
 const subscribed = ref(false);
