@@ -3,9 +3,7 @@
     <div class="container-bos flex items-center gap-4 py-3">
       <!-- Logo -->
       <router-link to="/" class="flex items-center gap-2 shrink-0">
-        <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-electric-500 to-cyan-400 flex items-center justify-center">
-          <span class="text-white font-display font-bold text-lg">B</span>
-        </div>
+        <BrandLogo :width="34" :height="35" icon-only class="shrink-0" />
         <div class="hidden sm:block leading-tight">
           <div class="font-display font-bold text-base tracking-tight" style="color: var(--text-primary);">BUEA <span class="text-electric-500">ONLINE SHOP</span></div>
         </div>
@@ -95,6 +93,7 @@
 <script setup>
 import { computed } from 'vue';
 import SearchBar from './SearchBar.vue';
+import BrandLogo from '../common/BrandLogo.vue';
 import { useUiStore } from '../../stores/ui';
 import { useAuthStore } from '../../stores/auth';
 import { useCartStore } from '../../stores/cart';

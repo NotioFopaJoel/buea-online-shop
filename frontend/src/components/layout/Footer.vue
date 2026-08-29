@@ -12,9 +12,7 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8">
         <div class="sm:col-span-2 md:col-span-2">
           <div class="flex items-center gap-2 mb-3">
-            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-electric-500 to-cyan-400 flex items-center justify-center">
-              <span class="text-white font-display font-bold text-sm">B</span>
-            </div>
+            <BrandLogo :width="30" :height="31" icon-only dark class="shrink-0" />
             <span class="font-display font-bold text-white">BUEA ONLINE SHOP</span>
           </div>
           <p class="text-sm text-white/60 mb-4">Shop Everything. Delivered in Buea.</p>
@@ -80,6 +78,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useUiStore } from '../../stores/ui';
 import orderService from '../../services/orderService';
+import BrandLogo from '../common/BrandLogo.vue';
 
 const uiStore = useUiStore();
 const subscribed = ref(false);

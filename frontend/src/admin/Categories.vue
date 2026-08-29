@@ -33,7 +33,7 @@
       <form class="space-y-3" @submit.prevent="handleSave">
         <FormField v-model="form.name" label="Name (English)" :error="errors.name" required />
         <FormField v-model="form.nameFr" label="Nom (Français)" />
-        <FormField v-model="form.image" label="Image URL" />
+        <ImageUploadField v-model="form.image" label="Category Photo" />
         <div>
           <label class="text-sm font-medium block mb-1.5">Parent Category (optional)</label>
           <select v-model="form.parentCategory" class="w-full px-3 py-2.5 rounded-lg text-sm" style="border: 1px solid var(--border-color); background-color: var(--bg-secondary); color: var(--text-primary);">
@@ -53,6 +53,7 @@ import api from '../services/api';
 import Loader from '../components/common/Loader.vue';
 import Modal from '../components/common/Modal.vue';
 import FormField from '../components/common/FormField.vue';
+import ImageUploadField from '../components/common/ImageUploadField.vue';
 import Button from '../components/common/Button.vue';
 import AdminNav from './components/AdminNav.vue';
 
