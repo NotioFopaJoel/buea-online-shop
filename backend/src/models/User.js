@@ -50,6 +50,9 @@ const userSchema = new mongoose.Schema(
     preferredLanguage: { type: String, enum: ['en', 'fr'], default: 'en' },
     isActive: { type: Boolean, default: true },
 
+    resetPasswordToken: { type: String, default: null },
+    resetPasswordExpires: { type: Date, default: null },
+
     // Referral / Shop Credit
     referralCode: { type: String, unique: true, sparse: true, default: null },
     referredBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },

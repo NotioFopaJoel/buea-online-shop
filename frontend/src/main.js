@@ -17,9 +17,14 @@ uiStore.initTheme();
 
 app.mount('#app');
 
-// Register the service worker (PWA install / offline) in production only.
-if (import.meta.env.PROD && 'serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
+// Register the service worker (PWA install / offline).
+// Registered in BOTH production and development: Chrome treats localhost as a
+// secure context, so registering the SW during dev lets the "beforeinstallprompt"
+// fire too — enabling direct one-click app install instead of fallback instructions.
+// Set localStorage "bos_register_sw" to '0' to disable in dev if it causes issues.
+if ('serviceWorker' in navigator) {
+  const allowDev = import.meta.env.DEV ? localStorage.getItem('bos_register_sw') !== '0' : true;
+  if (allowDev) {
     navigator.serviceWorker.register('/sw.js').catch(() => {});
-  });
+  }
 }
