@@ -2,7 +2,13 @@ package com.buea.shop;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,6 +29,41 @@ public class MainActivity extends Activity {
 
     private WebView webView;
     private ProgressBar progressBar;
+
+    private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (isOnline()) {
+                // Reconnect automatically when the network comes back.
+                if (webView != null) {
+                    String url = webView.getUrl();
+                    if (url != null && url.startsWith("file:///android_asset/")) {
+                        loadApp();
+                    } else {
+                        webView.reload();
+                    }
+                }
+            }
+        }
+    };
+
+    private void loadOfflinePage() {
+        if (webView == null) return;
+        webView.loadUrl("file:///android_asset/offline.html");
+    }
+
+    private void loadApp() {
+        if (webView == null) return;
+        progressBar.setVisibility(View.VISIBLE);
+        webView.loadUrl(APP_URL);
+    }
+
+    private boolean isOnline() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm == null) return true;
+        NetworkInfo ni = cm.getActiveNetworkInfo();
+        return ni != null && ni.isConnected();
+    }
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -54,6 +95,8 @@ public class MainActivity extends Activity {
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri url = request.getUrl();
                 String host = url.getHost();
+                // Avoid overriding the local offline asset.
+                if ("android_asset".equals(host)) return false;
                 // Open BUEA links inside the app; everything else (WhatsApp, tel, etc.) in the browser.
                 if (host != null && (host.equals(HOST) || host.endsWith("." + HOST))) {
                     return false;
@@ -65,6 +108,18 @@ public class MainActivity extends Activity {
                 } catch (Exception ignored) {
                 }
                 return true;
+            }
+
+            @Override
+            public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+                if (errorCode == WebViewClient.ERROR_HOST_LOOKUP
+                        || errorCode == WebViewClient.ERROR_CONNECT
+                        || errorCode == WebViewClient.ERROR_TIMEOUT
+                        || errorCode == WebViewClient.ERROR_IO
+                        || errorCode == WebViewClient.ERROR_FAILED_SSL_HANDSHAKE
+                        || errorCode == -1) {
+                    loadOfflinePage();
+                }
             }
 
             @Override
@@ -90,6 +145,8 @@ public class MainActivity extends Activity {
         });
 
         webView.loadUrl(APP_URL);
+
+        registerReceiver(networkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
     }
 
     @Override
@@ -119,6 +176,10 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        try {
+            unregisterReceiver(networkReceiver);
+        } catch (Exception ignored) {
+        }
         if (webView != null) {
             webView.destroy();
         }
