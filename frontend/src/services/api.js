@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+// In production the frontend and API are both served from the same Vercel
+// domain, with "/api" proxied to the backend (see vercel.json). This keeps all
+// requests same-origin so the service worker can cache catalogue data offline.
+const API_URL = import.meta.env.PROD ? '/api' : (import.meta.env.VITE_API_URL || 'http://localhost:5000/api');
 
 const api = axios.create({
   baseURL: API_URL,

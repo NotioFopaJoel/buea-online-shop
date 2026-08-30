@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+// In production both frontend and API are served from the same Vercel domain
+// ("/api" is proxied to the backend, see vercel.json). In dev we use the proxy
+// on port 5173 -> backend on port 5000.
+const API_URL = import.meta.env.PROD ? '/api' : (import.meta.env.VITE_API_URL || 'http://localhost:5000/api');
 
 // A dedicated instance (not the shared api.js one) because that instance sets
 // a default 'Content-Type: application/json' header, which would override

@@ -1,5 +1,5 @@
-/* BUEA ONLINE SHOP — service worker (v2) */
-const VERSION = 'bos-v2';
+/* BUEA ONLINE SHOP — service worker (v3) */
+const VERSION = 'bos-v3';
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -52,6 +52,22 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET') return;
 
   const url = new URL(request.url);
+
+  // Cache safe, authenticated-data-free GET endpoints the catalogue needs
+  // offline. Read-only endpoints (products, categories, adverts, public
+  // settings) are cached network-first so fresh data wins online but the last
+  // known data is shown when offline.
+  const CACHEABLE_API = [
+    '/api/products',
+    '/api/categories',
+    '/api/advertisements/active',
+    '/api/public/settings',
+    '/api/public/delivery-zones',
+  ];
+  if (CACHEABLE_API.some((p) => url.pathname.startsWith(p))) {
+    event.respondWith(cacheFirstFetch(request));
+    return;
+  }
 
   // Cache images (Cloudinary/external + same-origin) so the catalogue keeps
   // showing product photos while offline.
